@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ImportCost">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>ImportCost</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--bg2:#111623;--bg3:#181e2e;--bg4:#1e2638;--accent:#00e5a0;--accent-d:#00b87d;--blue:#3d8ef8;--warn:#ffa040;--danger:#ff5555;--text:#eef0f6;--text2:#7c8399;--text3:#3d4460;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--mono:'DM Mono',monospace;--sans:'Noto Sans KR',sans-serif;--r:14px;--r-lg:20px;--safe-t:env(safe-area-inset-top,44px);--safe-b:env(safe-area-inset-bottom,24px)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input,select,button{font-family:var(--sans);-webkit-appearance:none;appearance:none;outline:none}
+::-webkit-scrollbar{display:none}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+.status-bar{height:var(--safe-t);background:var(--bg2);flex-shrink:0}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.header-logo{font-size:20px;font-weight:700;color:var(--accent);letter-spacing:-1px}
+.header-logo span{color:var(--text2);font-weight:300;font-size:12px;margin-left:6px;letter-spacing:0}
+.rate-chip{display:flex;align-items:center;gap:6px;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;padding:6px 12px;font-family:var(--mono);font-size:12px;color:var(--text);cursor:pointer}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.prog-wrap{background:var(--bg2);padding:10px 20px 14px;flex-shrink:0}
+.step-labels{display:flex;justify-content:space-between;margin-bottom:8px}
+.sl{font-size:10px;color:var(--text3);font-family:var(--mono);text-align:center;flex:1;transition:color .25s}
+.sl.on{color:var(--accent)}.sl.done{color:var(--accent-d)}
+.prog-track{height:3px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 8px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px}
+.card-head{font-size:15px;font-weight:500;margin-bottom:2px}
+.card-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
+.slbl{font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.field{margin-bottom:14px}.field:last-child{margin-bottom:0}
+.field>label{display:block;font-size:11px;color:var(--text2);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.iw{position:relative}
+.iw select,.iw input,input.f,select.f{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);padding:13px 16px;color:var(--text);font-size:14px;transition:border-color .15s,background .15s}
+.iw select:focus,.iw input:focus{border-color:var(--accent);background:var(--bg4)}
+.iw.sel::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:11px;pointer-events:none}
+input[readonly]{color:var(--accent);font-family:var(--mono)}
+.fn{font-size:11px;color:var(--text3);margin-top:5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fta-ban{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--r);font-size:12px;line-height:1.5;margin-top:14px}
+.fta-yes{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);color:var(--accent)}
+.fta-no{background:rgba(255,160,64,.08);border:1px solid rgba(255,160,64,.2);color:var(--warn)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{padding:4px 10px;border-radius:20px;font-size:11px;font-family:var(--mono)}
+.tg{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tb{background:rgba(61,142,248,.1);color:var(--blue);border:1px solid rgba(61,142,248,.2)}
+.tw{background:rgba(255,160,64,.1);color:var(--warn);border:1px solid rgba(255,160,64,.2)}
+.tx{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border)}
+.notice{display:flex;gap:8px;align-items:flex-start;padding:10px 14px;border-radius:var(--r);font-size:12px;line-height:1.5;margin-top:10px}
+.nw{background:rgba(255,160,64,.08);border:1px solid rgba(255,160,64,.15);color:var(--warn)}
+.nb{background:rgba(61,142,248,.08);border:1px solid rgba(61,142,248,.15);color:var(--blue)}
+.inc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.inc-btn{padding:11px 4px 8px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;font-family:var(--mono);text-align:center;cursor:pointer;transition:all .15s}
+.inc-nm{font-size:12px;font-weight:700;display:block}
+.inc-sb{font-size:9px;color:var(--text3);margin-top:3px;display:block}
+.inc-btn.on{background:rgba(0,229,160,.1);border-color:var(--accent);color:var(--accent)}
+.inc-btn.on .inc-sb{color:rgba(0,229,160,.5)}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.rrow:last-child{border-bottom:none}
+.rl{font-size:13px;color:var(--text2)}.rv{font-family:var(--mono);font-size:13px}
+.total-box{background:linear-gradient(135deg,rgba(0,229,160,.12),rgba(0,229,160,.04));border:1px solid rgba(0,229,160,.25);border-radius:var(--r-lg);padding:20px;margin-bottom:12px;text-align:center}
+.t-lbl{font-size:11px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px}
+.t-num{font-size:32px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:-1px;margin:8px 0 4px}
+.t-sub{font-size:12px;color:var(--text2);font-family:var(--mono)}
+.urow{display:flex;gap:8px;margin-top:12px}
+.ubox{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.ulbl{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.uval{font-size:15px;font-weight:500;color:var(--text);font-family:var(--mono);margin-top:4px}
+.brow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.bl{font-size:11px;color:var(--text2);width:60px;flex-shrink:0}
+.btrack{flex:1;height:6px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.bfill{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.bpct{font-size:11px;color:var(--text3);font-family:var(--mono);width:34px;text-align:right;flex-shrink:0}
+.sc-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.sc{min-width:120px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 12px;flex-shrink:0;text-align:center}
+.sc.best{border-color:var(--accent);background:rgba(0,229,160,.06)}
+.sc-nm{font-size:11px;font-family:var(--mono);color:var(--text3);margin-bottom:6px}
+.sc-p{font-size:16px;font-family:var(--mono);font-weight:700;color:var(--text)}
+.sc-p.bc{color:var(--accent)}
+.tabs{display:flex;background:var(--bg3);border-radius:var(--r);padding:4px;margin-bottom:14px;gap:4px}
+.tab{flex:1;text-align:center;padding:9px;font-size:13px;color:var(--text2);border-radius:10px;cursor:pointer;transition:all .15s}
+.tab.on{background:var(--bg2);color:var(--text);border:1px solid var(--border2)}
+.si{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;cursor:pointer;transition:background .15s}
+.si:active{background:var(--bg4)}
+.si-nm{font-size:14px;font-weight:500}
+.si-mt{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:3px}
+.si-pr{font-size:14px;font-family:var(--mono);color:var(--accent)}
+.btm{background:var(--bg2);border-top:1px solid var(--border);padding:12px 16px;padding-bottom:calc(12px + var(--safe-b));display:flex;gap:10px;flex-shrink:0}
+.bbk{flex:0 0 52px;height:52px;border-radius:var(--r);background:var(--bg3);border:1.5px solid var(--border2);color:var(--text2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.bbk:active{background:var(--bg4)}
+.bnx{flex:1;height:52px;border-radius:var(--r);background:var(--accent);border:none;color:#000;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-.3px;transition:background .15s,transform .1s}
+.bnx:active{background:var(--accent-d);transform:scale(.98)}
+.ibar{display:none;align-items:center;gap:10px;background:rgba(0,229,160,.08);border-bottom:1px solid rgba(0,229,160,.2);padding:10px 16px;flex-shrink:0}
+.ibar.show{display:flex}
+.ibar p{flex:1;font-size:12px;color:var(--accent)}
+.ibtn{padding:6px 14px;background:var(--accent);border:none;border-radius:20px;color:#000;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.offbar{display:none;text-align:center;padding:8px;background:rgba(255,160,64,.1);border-bottom:1px solid rgba(255,160,64,.2);font-size:12px;color:var(--warn);flex-shrink:0}
+.offbar.show{display:block}
+#toast{position:fixed;bottom:calc(90px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg4);border:1px solid var(--border2);border-radius:24px;padding:10px 22px;font-size:13px;color:var(--text);opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.view{display:none}.view.on{display:block}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="status-bar"></div>
+  <div class="ibar" id="ibar"><p>홈 화면에 추가하면 앱처럼 사용할 수 있어요</p><button class="ibtn" id="ibtn">추가</button></div>
+  <div class="offbar" id="offbar">오프라인 — 저장된 환율 기준</div>
+  <div class="header">
+    <div><div class="header-logo">ImportCost<span>수입원가 계산기</span></div></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="rate-chip" id="rchip" onclick="showSaved()"><div class="live-dot"></div><span id="hrate">저장목록</span></div>
+    </div>
+  </div>
+  <div class="prog-wrap" id="pwrap">
+    <div class="step-labels">
+      <div class="sl on" id="sl1">국가</div><div class="sl" id="sl2">공급가</div>
+      <div class="sl" id="sl3">운임</div><div class="sl" id="sl4">관세</div>
+      <div class="sl" id="sl5">부대비</div><div class="sl" id="sl6">결과</div>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="pfill" style="width:16.6%"></div></div>
+  </div>
+  <div id="ratepanel" style="background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;flex-shrink:0;display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;">실시간 환율</span>
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono);" id="rate-updated">로딩 중...</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+    <div style="background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--border);">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">USD</div>
+      <div style="font-size:15px;font-weight:500;color:var(--text);font-family:var(--mono);margin-top:3px;" id="rc-usd">1,374</div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;">원</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--border);">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">CNY</div>
+      <div style="font-size:15px;font-weight:500;color:var(--accent);font-family:var(--mono);margin-top:3px;" id="rc-cny">190.2</div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;">원</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--border);">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">EUR</div>
+      <div style="font-size:15px;font-weight:500;color:var(--text);font-family:var(--mono);margin-top:3px;" id="rc-eur">1,498</div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;">원</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid var(--border);">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);">JPY</div>
+      <div style="font-size:15px;font-weight:500;color:var(--text);font-family:var(--mono);margin-top:3px;" id="rc-jpy">9.18</div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;">원</div>
+    </div>
+  </div>
+</div>
+<div class="scroll" id="scroll">
+
+    <!-- S1 -->
+    <div class="view on" id="v1">
+      <div class="card">
+        <div class="card-head">수출국 설정</div>
+        <div class="card-sub">어느 나라에서 수입하시나요?</div>
+        <div class="field"><label>수출 국가</label><div class="iw sel"><select id="sc" onchange="onC()">
+          <option value="">국가를 선택하세요</option>
+          <option value="CN">🇨🇳 중국 (China)</option>
+          <option value="VN">🇻🇳 베트남 (Vietnam)</option>
+          <option value="US">🇺🇸 미국 (USA)</option>
+          <option value="DE">🇩🇪 독일 (Germany)</option>
+          <option value="JP">🇯🇵 일본 (Japan)</option>
+          <option value="AU">🇦🇺 호주 (Australia)</option>
+          <option value="IN">🇮🇳 인도 (India)</option>
+          <option value="TH">🇹🇭 태국 (Thailand)</option>
+          <option value="MY">🇲🇾 말레이시아</option>
+          <option value="SG">🇸🇬 싱가포르</option>
+          <option value="BR">🇧🇷 브라질 (Brazil)</option>
+          <option value="RU">🇷🇺 러시아 (Russia)</option>
+          <option value="SA">🇸🇦 사우디아라비아</option>
+        </select></div></div>
+        <div class="field"><label>수출 항구</label><div class="iw sel"><select id="sp" disabled><option>국가 선택 후 표시됩니다</option></select></div></div>
+        <div class="g2">
+          <div class="field"><label>수입 국가</label><div class="iw sel"><select disabled style="color:var(--accent);border-color:rgba(0,229,160,.3);"><option>🇰🇷 대한민국</option></select></div></div>
+          <div class="field"><label>수입 항구</label><div class="iw sel"><select id="sip"><option>부산항</option><option>인천항</option><option>군산항</option><option>광양항</option><option>평택항</option><option>울산항</option><option>목포항</option><option>포항항</option><option>마산항</option></select></div></div>
+        </div>
+        <div id="ftabox" style="display:none;">
+          <div id="ftaban" class="fta-ban fta-yes"><span id="ftaico" style="font-size:16px;flex-shrink:0;margin-top:1px;">✓</span><span id="ftatxt" style="font-size:12px;"></span></div>
+          <div class="tags" id="ftatags"></div>
+          <div class="notice nw" id="vatnote" style="display:none;"><span>⚠</span><span>중국 공급자의 VAT 환급세(9~13%) 포함 여부를 반드시 확인하세요.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="slbl">Incoterms 2020 — 거래 조건</div>
+        <div class="inc-grid">
+          <div class="inc-btn" onclick="pi(this,'EXW')"><span class="inc-nm">EXW</span><span class="inc-sb">공장인도</span></div>
+          <div class="inc-btn" onclick="pi(this,'FCA')"><span class="inc-nm">FCA</span><span class="inc-sb">운송인인도</span></div>
+          <div class="inc-btn" onclick="pi(this,'FAS')"><span class="inc-nm">FAS</span><span class="inc-sb">선측인도</span></div>
+          <div class="inc-btn on" onclick="pi(this,'FOB')"><span class="inc-nm">FOB</span><span class="inc-sb">본선인도</span></div>
+          <div class="inc-btn" onclick="pi(this,'CFR')"><span class="inc-nm">CFR</span><span class="inc-sb">운임포함</span></div>
+          <div class="inc-btn" onclick="pi(this,'CIF')"><span class="inc-nm">CIF</span><span class="inc-sb">운임+보험</span></div>
+          <div class="inc-btn" onclick="pi(this,'CPT')"><span class="inc-nm">CPT</span><span class="inc-sb">운송비지급</span></div>
+          <div class="inc-btn" onclick="pi(this,'CIP')"><span class="inc-nm">CIP</span><span class="inc-sb">운송+보험</span></div>
+          <div class="inc-btn" onclick="pi(this,'DAP')"><span class="inc-nm">DAP</span><span class="inc-sb">목적지인도</span></div>
+          <div class="inc-btn" onclick="pi(this,'DPU')"><span class="inc-nm">DPU</span><span class="inc-sb">양하후인도</span></div>
+          <div class="inc-btn" onclick="pi(this,'DDP')"><span class="inc-nm">DDP</span><span class="inc-sb">완전인도</span></div>
+        </div>
+        <div class="notice nb" style="margin-top:12px;"><span>ℹ</span><span id="incnote" style="font-size:11px;">FOB: 수출국 내륙운송·수출통관 매도인 부담. 해상운임부터 매수인 부담.</span></div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="view" id="v2">
+      <div class="card">
+        <div class="card-head">공급가 입력</div><div class="card-sub">계약 단가 · 수량 · 결제통화</div>
+        <div class="g2">
+          <div class="field"><label>결제 통화</label><div class="iw sel"><select id="scur" onchange="onCur()"><option value="CNY">CNY 위안</option><option value="USD">USD 달러</option><option value="EUR">EUR 유로</option><option value="JPY">JPY 엔</option><option value="AUD">AUD 호주$</option></select></div></div>
+          <div class="field"><label>적용 환율 (KRW)</label><div class="iw"><input type="number" id="irate" placeholder="190.20" step="0.01" inputmode="decimal" oninput="G.re=1;calc()"></div><div class="fn" id="rnote">불러오는 중...</div></div>
+        </div>
+        <div class="g2">
+          <div class="field"><label id="plbl">단가 (CNY/MT)</label><div class="iw"><input type="number" id="iprice" placeholder="0.00" step="0.01" inputmode="decimal" oninput="calc()"></div></div>
+          <div class="field"><label>수량 (MT)</label><div class="iw"><input type="number" id="iqty" placeholder="0" step="1" inputmode="numeric" oninput="calc()"></div></div>
+        </div>
+        <div class="field"><label>공급가 합계 (KRW)</label><div class="iw"><input type="text" id="isup" readonly placeholder="자동 계산"></div></div>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="view" id="v3">
+      <div class="card">
+        <div class="card-head">운임 & 보험료</div><div class="card-sub">Incoterms 조건에 따라 입력</div>
+        <div class="field"><label>해상운임 (USD/컨테이너)</label><div class="iw"><input type="number" id="iocean" placeholder="0" step="1" inputmode="numeric" oninput="calc()"></div><div class="fn">SCFI 참고: 약 $1,800~2,000</div></div>
+        <div class="g2">
+          <div class="field"><label>컨테이너</label><div class="iw sel"><select id="scnt" onchange="calc()"><option value="1">20ft × 1개</option><option value="2">20ft × 2개</option><option value="1.5">40ft × 1개</option><option value="3">40ft × 2개</option></select></div></div>
+          <div class="field"><label>보험료 (KRW)</label><div class="iw"><input type="number" id="iins" placeholder="자동계산" step="1000" oninput="calc()"></div><div class="fn">CIF/CIP 자동</div></div>
+        </div>
+        <div class="field"><label>수출국 내륙운송 (현지통화)</label><div class="iw"><input type="number" id="iinland" placeholder="EXW 조건 시 입력" step="100" oninput="calc()"></div></div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="view" id="v4">
+      <div class="card">
+        <div class="card-head">관세 & 세금</div><div class="card-sub">HS코드 입력 시 세율 자동 추천</div>
+        <div class="g2">
+          <div class="field"><label>HS 코드</label><div class="iw"><input type="text" id="ihs" placeholder="예) 3901.10" oninput="onHs(this.value)"></div></div>
+          <div class="field"><label>품목명</label><div class="iw"><input type="text" id="ipnm" placeholder="예) LLDPE 수지"></div></div>
+        </div>
+        <div class="tags" id="hssugg" style="margin-bottom:12px;"></div>
+        <div class="g2">
+          <div class="field"><label>기본 관세율 (%)</label><div class="iw"><input type="number" id="itbase" placeholder="6.5" step="0.1" oninput="calc()"></div></div>
+          <div class="field"><label>적용 관세율 (%)</label><div class="iw"><input type="number" id="itariff" placeholder="0" step="0.1" oninput="calc()" style="color:var(--accent);font-family:var(--mono);"></div><div class="fn" id="tnote">FTA 적용 시 자동입력</div></div>
+        </div>
+        <div class="g2">
+          <div class="field"><label>관세액 (KRW)</label><div class="iw"><input type="text" id="itamt" readonly placeholder="자동 계산"></div></div>
+          <div class="field"><label>부가가치세 (KRW)</label><div class="iw"><input type="text" id="ivamt" readonly placeholder="자동 계산"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="view" id="v5">
+      <div class="card">
+        <div class="card-head">부대비용</div><div class="card-sub">항만 · 통관 · 운송 · 기타</div>
+        <div class="g2">
+          <div class="field"><label>항만 하역료</label><div class="iw"><input type="number" id="iport" value="350000" step="10000" inputmode="numeric" oninput="calc()"></div><div class="fn">부산항 기준</div></div>
+          <div class="field"><label>통관 수수료</label><div class="iw"><input type="number" id="icust" value="150000" step="10000" inputmode="numeric" oninput="calc()"></div><div class="fn">관세사 대행</div></div>
+          <div class="field"><label>국내 내륙운송</label><div class="iw"><input type="number" id="idtrans" value="500000" step="10000" inputmode="numeric" oninput="calc()"></div><div class="fn">항구→창고</div></div>
+          <div class="field"><label>검사·검역비</label><div class="iw"><input type="number" id="iinsp" value="100000" step="10000" inputmode="numeric" oninput="calc()"></div></div>
+          <div class="field"><label>창고료·기타</label><div class="iw"><input type="number" id="iware" value="0" step="10000" inputmode="numeric" oninput="calc()"></div></div>
+          <div class="field"><label>예비비 (%)</label><div class="iw"><input type="number" id="icont" value="1" step="0.5" inputmode="decimal" oninput="calc()"></div><div class="fn">총원가 대비</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div class="view" id="v6">
+      <div class="tabs"><div class="tab on" onclick="stab('r',this)">원가 분석</div><div class="tab" onclick="stab('c',this)">조건 비교</div></div>
+      <div id="tr">
+        <div class="total-box"><div class="t-lbl">최종 수입원가</div><div class="t-num" id="rtot">— 원</div><div class="t-sub" id="rper">톤당 — 원/MT</div>
+          <div class="urow"><div class="ubox"><div class="ulbl">USD/MT</div><div class="uval" id="rusd">—</div></div><div class="ubox"><div class="ulbl">관세 비율</div><div class="uval" id="rtrate">—</div></div><div class="ubox"><div class="ulbl">수량</div><div class="uval" id="rqty">—</div></div></div>
+        </div>
+        <div class="card"><div class="slbl">비용 구성 내역</div>
+          <div class="rrow"><span class="rl">공급가</span><span class="rv" id="rsup">—</span></div>
+          <div class="rrow"><span class="rl">해상운임</span><span class="rv" id="rfrt">—</span></div>
+          <div class="rrow"><span class="rl">보험료</span><span class="rv" id="rins">—</span></div>
+          <div class="rrow"><span class="rl">관세</span><span class="rv" id="rtar">—</span></div>
+          <div class="rrow"><span class="rl">부가세</span><span class="rv" id="rvat">—</span></div>
+          <div class="rrow"><span class="rl">부대비용</span><span class="rv" id="rmisc">—</span></div>
+          <div class="rrow"><span class="rl">예비비</span><span class="rv" id="rcon">—</span></div>
+        </div>
+        <div class="card"><div class="slbl">비용 구성 비율</div><div id="bars"></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button style="flex:1;height:48px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:13px;cursor:pointer;" onclick="save()">저장</button>
+          <button style="flex:1;height:48px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--blue);font-size:13px;cursor:pointer;" onclick="share()">공유</button>
+        </div>
+      </div>
+      <div id="tc" style="display:none;">
+        <div class="card"><div class="slbl">조건별 원가 비교</div><div class="sc-scroll" id="scrow"></div></div>
+        <div class="notice nb"><span>ℹ</span><span style="font-size:11px;">동일 공급가·수량 기준으로 조건별 원가를 시뮬레이션합니다.</span></div>
+      </div>
+    </div>
+
+    <!-- Saved -->
+    <div class="view" id="vsaved">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:16px;font-weight:500;">저장된 계산</div>
+        <div style="font-size:13px;color:var(--accent);cursor:pointer;" onclick="hideSaved()">← 돌아가기</div>
+      </div>
+      <div id="slist"></div>
+      <button style="width:100%;height:52px;background:var(--accent);border:none;border-radius:var(--r);color:#000;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;" onclick="resetAll()">새 계산 시작</button>
+    </div>
+
+  </div>
+  <div class="btm" id="btm">
+    <button class="bbk" id="bbk" onclick="go(G.s-1)" style="display:none;">←</button>
+    <button class="bnx" id="bnx" onclick="go(G.s+1)">다음 단계 →</button>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const G={s:1,country:'',inc:'FOB',re:0,R:{CNY:190.2,USD:1374,EUR:1498,JPY:9.18,AUD:880},res:null};
+const PORTS={CN:['상하이항','칭다오항','텐진항','광저우항','닝보항','선전항','다롄항'],VN:['호치민항','하이퐁항','다낭항'],US:['LA항','롱비치항','뉴욕항','시애틀항'],DE:['함부르크항','브레멘항'],JP:['도쿄항','요코하마항','오사카항','나고야항'],AU:['시드니항','멜버른항','브리즈번항'],IN:['뭄바이항','첸나이항','자와할랄네루항'],TH:['람차방항','방콕항'],MY:['포트클랑항','페낭항'],SG:['싱가포르항'],BR:['산토스항','리우항'],RU:['블라디보스토크항','나호트카항'],SA:['담맘항','지다항']};
+const FTA={CN:{y:1,nm:'한-중 FTA',rt:'협정세율 적용',co:'중국 세관'},VN:{y:1,nm:'한-베트남 FTA/RCEP',rt:'협정세율 적용',co:'베트남 상공회의소'},US:{y:1,nm:'한-미 FTA(KORUS)',rt:'대부분 0%',co:'CBP Form 434'},DE:{y:1,nm:'한-EU FTA',rt:'대부분 0%',co:'EUR.1'},JP:{y:0,nm:'RCEP 적용',rt:'RCEP 세율',co:'일본 상공회의소'},AU:{y:1,nm:'한-호주 FTA',rt:'대부분 0%',co:'호주 상공회의소'},IN:{y:1,nm:'한-인도 CEPA',rt:'협정세율 적용',co:'인도 수출검사위원회'},TH:{y:1,nm:'ASEAN-한국 FTA',rt:'협정세율 적용',co:'태국 상공회의소'},MY:{y:1,nm:'ASEAN-한국 FTA',rt:'협정세율 적용',co:'말레이시아 상공회의소'},SG:{y:1,nm:'ASEAN-한국 FTA',rt:'협정세율 적용',co:'싱가포르 상공회의소'},BR:{y:0,nm:'FTA 미체결',rt:'MFN 일반세율',co:'불필요'},RU:{y:0,nm:'FTA 미체결',rt:'MFN 일반세율',co:'불필요'},SA:{y:0,nm:'FTA 미체결',rt:'MFN 일반세율',co:'불필요'}};
+const HS={'3901.10':{nm:'LLDPE 수지',t:6.5,fcn:4.0},'3907.99':{nm:'PBAT 수지',t:6.5,fcn:3.2},'3902.10':{nm:'PP 호모폴리머',t:5.5,fcn:3.0},'3901.20':{nm:'HDPE 수지',t:6.5,fcn:4.0},'3920.20':{nm:'PP 필름',t:8.0,fcn:4.8},'1006.30':{nm:'정미(쌀)',t:513,fcn:0},'1005.90':{nm:'옥수수',t:328,fcn:0},'8108.20':{nm:'하프늄',t:0,fcn:0}};
+const IM={EXW:'매수인이 공장에서 직접 픽업. 내륙운송·수출통관·해상운임 모두 매수인 부담.',FCA:'수출통관 매도인 부담. 운송인 인도 이후 매수인 부담.',FAS:'선측 인도. 수출통관 매도인 부담.',FOB:'수출국 내륙운송·수출통관 매도인 부담. 해상운임부터 매수인 부담.',CFR:'해상운임 매도인 부담. 보험료·수입통관 매수인 부담.',CIF:'해상운임·보험료 매도인 부담. 수입통관만 매수인 부담.',CPT:'지정지까지 운송비 매도인 부담.',CIP:'운송비·보험료 매도인 부담. CIF보다 높은 보험 커버리지.',DAP:'목적지 도착 인도. 수입통관·하역 매수인 부담.',DPU:'양하 후 인도. 목적지 하역까지 매도인 부담.',DDP:'관세 포함 완전 인도. 매수인 부담 최소.'};
+
+async function loadRates(){
+  const el=document.getElementById('rnote');
+  try{
+    const res=await fetch('https://open.er-api.com/v6/latest/USD');
+    if(!res.ok)throw 0;
+    const d=await res.json(),k=d.rates.KRW;
+    G.R={USD:Math.round(k),CNY:parseFloat((k/d.rates.CNY).toFixed(2)),EUR:Math.round(k/d.rates.EUR),JPY:parseFloat((k/d.rates.JPY).toFixed(4)),AUD:Math.round(k/d.rates.AUD)};
+    localStorage.setItem('icr',JSON.stringify({r:G.R,ts:Date.now()}));
+    document.getElementById('hrate').textContent='저장목록';
+    if(el)el.textContent='실시간 · '+new Date().toLocaleDateString('ko-KR');
+    updateRatePanel(true, new Date(d.time_last_update_unix*1000).toLocaleDateString('ko-KR'));
+  }catch{
+    const s=localStorage.getItem('icr');
+    if(s){const p=JSON.parse(s);G.R=p.r;if(el)el.textContent='캐시 · '+new Date(p.ts).toLocaleDateString('ko-KR');}
+    else{if(el)el.textContent='기본값 (수동 수정 가능)';}
+    document.getElementById('hrate').textContent='USD '+G.R.USD.toLocaleString();
+  }
+  applyRate();
+}
+
+function applyRate(){
+  if(G.re)return;
+  const cur=document.getElementById('scur')?.value||'CNY';
+  const el=document.getElementById('irate');
+  if(el)el.value=G.R[cur]??G.R.USD;
+  calc();
+}
+
+function onC(){
+  const c=document.getElementById('sc').value; G.country=c;
+  const ps=document.getElementById('sp'); ps.innerHTML=''; ps.disabled=!c;
+  if(!c){document.getElementById('ftabox').style.display='none';return;}
+  (PORTS[c]||[]).forEach(p=>{const o=document.createElement('option');o.textContent=p;ps.appendChild(o);});
+  const f=FTA[c]||{y:0,nm:'FTA 미체결',rt:'MFN 일반세율',co:'불필요'};
+  const ban=document.getElementById('ftaban');
+  ban.className='fta-ban '+(f.y?'fta-yes':'fta-no');
+  document.getElementById('ftaico').textContent=f.y?'✓':'!';
+  document.getElementById('ftatxt').textContent=f.nm+' — '+f.rt+(f.y?' (CO: '+f.co+')':'');
+  const tags=document.getElementById('ftatags'); tags.innerHTML='';
+  const cur={CN:'CNY',JP:'JPY',DE:'EUR',AU:'AUD'}[c]||'USD';
+  const fi=['BR','RU'].includes(c)?'BDI 연동':'SCFI 연동';
+  [{l:'통화: '+cur,cls:'tb'},{l:fi,cls:'tx'},{l:'관세 자동조회',cls:'tg'},...(f.y?[{l:'CO 필요',cls:'tw'}]:[])].forEach(t=>{const d=document.createElement('div');d.className='tag '+t.cls;d.textContent=t.l;tags.appendChild(d);});
+  document.getElementById('vatnote').style.display=c==='CN'?'flex':'none';
+  document.getElementById('ftabox').style.display='block';
+  const cs=document.getElementById('scur'); cs.value=cur in G.R?cur:'USD';
+  G.re=0; applyRate();
+  document.getElementById('plbl').textContent='단가 ('+cs.value+'/MT)';
+}
+
+function onCur(){G.re=0;applyRate();document.getElementById('plbl').textContent='단가 ('+(document.getElementById('scur').value)+'/MT)';}
+
+function pi(el,val){document.querySelectorAll('.inc-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');G.inc=val;document.getElementById('incnote').textContent=IM[val];}
+
+function onHs(v){
+  const el=document.getElementById('hssugg'); el.innerHTML='';
+  if(v.length<3)return;
+  const cl=v.replace('.','');
+  Object.entries(HS).forEach(([code,info])=>{
+    if(code.replace('.','').startsWith(cl)){const d=document.createElement('div');d.className='tag tx';d.style.cursor='pointer';d.textContent=code+' '+info.nm;d.onclick=()=>applyHs(code,info);el.appendChild(d);}
+  });
+}
+
+function applyHs(code,info){
+  document.getElementById('ihs').value=code;
+  document.getElementById('ipnm').value=info.nm;
+  document.getElementById('itbase').value=info.t;
+  const f=FTA[G.country];
+  const r=f&&f.y&&info.fcn!=null?info.fcn:info.t;
+  document.getElementById('itariff').value=r;
+  const tn=document.getElementById('tnote');
+  if(f&&f.y&&info.fcn!=null){tn.textContent='FTA 협정세율: '+r+'% 자동 적용';tn.style.color='var(--accent)';}
+  else{tn.textContent='FTA 미적용 — 기본세율';tn.style.color='var(--warn)';}
+  document.getElementById('hssugg').innerHTML='';
+  calc();
+}
+
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+
+function calc(){
+  const price=parseFloat(document.getElementById('iprice')?.value)||0;
+  const qty=parseFloat(document.getElementById('iqty')?.value)||0;
+  const rate=parseFloat(document.getElementById('irate')?.value)||G.R.USD;
+  const supply=price*qty*rate;
+  const es=document.getElementById('isup'); if(es)es.value=supply>0?fmt(supply)+' 원':'';
+  const oceanUSD=(parseFloat(document.getElementById('iocean')?.value)||0)*(parseFloat(document.getElementById('scnt')?.value)||1);
+  const ocean=oceanUSD*G.R.USD;
+  const inland=(parseFloat(document.getElementById('iinland')?.value)||0)*rate;
+  const cifBase=supply+ocean+inland;
+  let ins=parseFloat(document.getElementById('iins')?.value)||0;
+  if(!ins&&['CIF','CIP'].includes(G.inc))ins=cifBase*0.003;
+  const tBase=cifBase+ins,tRate=(parseFloat(document.getElementById('itariff')?.value)||0)/100,tAmt=tBase*tRate;
+  const vatBase=tBase+tAmt,vatAmt=vatBase*0.1;
+  const eta=document.getElementById('itamt'); if(eta)eta.value=fmt(tAmt)+' 원';
+  const eva=document.getElementById('ivamt'); if(eva)eva.value=fmt(vatAmt)+' 원';
+  const port=parseFloat(document.getElementById('iport')?.value)||0,cust=parseFloat(document.getElementById('icust')?.value)||0,dtrans=parseFloat(document.getElementById('idtrans')?.value)||0,insp=parseFloat(document.getElementById('iinsp')?.value)||0,ware=parseFloat(document.getElementById('iware')?.value)||0;
+  const misc=port+cust+dtrans+insp+ware;
+  const sub=supply+ocean+ins+tAmt+vatAmt+misc+inland;
+  const contPct=(parseFloat(document.getElementById('icont')?.value)||0)/100,contAmt=sub*contPct,total=sub+contAmt;
+  G.res={supply,ocean,ins,tAmt,vatAmt,misc,contAmt,total,qty,rate};
+  renderRes();
+}
+
+function renderRes(){
+  const R=G.res; if(!R)return;
+  const e=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  e('rtot',fmt(R.total)+' 원'); e('rper','톤당 '+(R.qty>0?fmt(R.total/R.qty):'—')+' 원/MT');
+  e('rusd','$'+(R.qty>0?fmt(R.total/R.qty/R.rate):'—')); e('rtrate',R.supply>0?(R.tAmt/R.supply*100).toFixed(1)+'%':'—');
+  e('rqty',(R.qty||0)+'MT'); e('rsup',fmt(R.supply)+' 원'); e('rfrt',fmt(R.ocean)+' 원');
+  e('rins',fmt(R.ins)+' 원'); e('rtar',fmt(R.tAmt)+' 원'); e('rvat',fmt(R.vatAmt)+' 원');
+  e('rmisc',fmt(R.misc)+' 원'); e('rcon',fmt(R.contAmt)+' 원');
+  renderBars(); renderSc();
+}
+
+function renderBars(){
+  const R=G.res; if(!R)return;
+  const it=[{l:'공급가',v:R.supply,c:'#00e5a0'},{l:'해상운임',v:R.ocean,c:'#3d8ef8'},{l:'보험료',v:R.ins,c:'#7c4dff'},{l:'관세',v:R.tAmt,c:'#ffa040'},{l:'부가세',v:R.vatAmt,c:'#ff5555'},{l:'부대비',v:R.misc,c:'#888'},{l:'예비비',v:R.contAmt,c:'#444'}];
+  const el=document.getElementById('bars'); if(!el)return;
+  el.innerHTML=it.filter(i=>i.v>0).map(i=>{const p=R.total>0?(i.v/R.total*100).toFixed(1):0;return`<div class="brow"><div class="bl">${i.l}</div><div class="btrack"><div class="bfill" style="width:${p}%;background:${i.c}"></div></div><div class="bpct">${p}%</div></div>`;}).join('');
+}
+
+function renderSc(){
+  const el=document.getElementById('scrow'); if(!el||!G.res)return;
+  const base=G.res.total,sc=[{n:'EXW',m:1.12},{n:'FOB',m:1.0},{n:'CIF',m:0.98},{n:'DDP',m:0.95}];
+  const min=Math.min(...sc.map(s=>base*s.m));
+  el.innerHTML=sc.map(s=>{const t=Math.round(base*s.m),best=t===min;return`<div class="sc${best?' best':''}"><div class="sc-nm">${s.n}</div><div class="sc-p${best?' bc':''}">${fmt(t)}</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono);">원</div>${best?'<div style="font-size:9px;color:var(--accent);font-family:var(--mono);margin-top:3px;">★ 최저</div>':''}</div>`;}).join('');
+}
+
+function go(n){
+  if(n<1||n>6)return;
+  document.getElementById('v'+G.s)?.classList.remove('on');
+  G.s=n;
+  document.getElementById('v'+n)?.classList.add('on');
+  document.getElementById('scroll').scrollTo({top:0,behavior:'smooth'});
+  updNav();
+  if(n===6){calc();renderRes();}
+}
+
+function updateRatePanel(live, dateStr){
+  const p=document.getElementById('ratepanel');
+  if(p)p.style.display='block';
+  const u=document.getElementById('rate-updated');
+  if(u)u.textContent=(live?'실시간':'캐시')+' · '+dateStr;
+  const el=id=>document.getElementById(id);
+  if(el('rc-usd'))el('rc-usd').textContent=G.R.USD.toLocaleString();
+  if(el('rc-cny'))el('rc-cny').textContent=G.R.CNY.toLocaleString();
+  if(el('rc-eur'))el('rc-eur').textContent=G.R.EUR.toLocaleString();
+  if(el('rc-jpy'))el('rc-jpy').textContent=G.R.JPY;
+  // 라이브 도트 색상
+  const dot=document.querySelector('.live-dot');
+  if(dot)dot.style.background=live?'var(--accent)':'var(--warn)';
+}
+function updNav(){
+  const n=G.s;
+  for(let i=1;i<=6;i++){const el=document.getElementById('sl'+i);if(!el)continue;el.className='sl'+(i===n?' on':i<n?' done':'');}
+  document.getElementById('pfill').style.width=(n/6*100)+'%';
+  document.getElementById('bbk').style.display=n===1?'none':'flex';
+  const bnx=document.getElementById('bnx');
+  if(n===6){bnx.textContent='저장 →';bnx.onclick=save;}
+  else{bnx.textContent='다음 단계 →';bnx.onclick=()=>go(G.s+1);}
+}
+
+function showSaved(){
+  for(let i=1;i<=6;i++)document.getElementById('v'+i)?.classList.remove('on');
+  document.getElementById('vsaved').classList.add('on');
+  document.getElementById('pwrap').style.display='none';
+  document.getElementById('btm').style.display='none';
+  renderSavedList();
+}
+
+function hideSaved(){
+  document.getElementById('vsaved').classList.remove('on');
+  document.getElementById('v'+G.s).classList.add('on');
+  document.getElementById('pwrap').style.display='block';
+  document.getElementById('btm').style.display='flex';
+}
+
+function stab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('tr').style.display=name==='r'?'block':'none';
+  document.getElementById('tc').style.display=name==='c'?'block':'none';
+  if(name==='c')renderSc();
+}
+
+function save(){
+  if(!G.res||!G.res.total){toast('계산 결과가 없습니다');return;}
+  const saves=JSON.parse(localStorage.getItem('ics')||'[]');
+  saves.unshift({id:Date.now(),country:G.country,inc:G.inc,product:document.getElementById('ipnm')?.value||'미입력',total:G.res.total,qty:G.res.qty,ts:Date.now()});
+  if(saves.length>30)saves.pop();
+  localStorage.setItem('ics',JSON.stringify(saves));
+  toast('저장되었습니다');
+}
+
+function renderSavedList(){
+  const saves=JSON.parse(localStorage.getItem('ics')||'[]');
+  const el=document.getElementById('slist');
+  if(!saves.length){el.innerHTML='<div style="text-align:center;padding:48px 0;color:var(--text3);font-size:13px;">저장된 계산이 없습니다</div>';return;}
+  el.innerHTML=saves.map(s=>`<div class="si"><div><div class="si-nm">${s.product||'미입력'}</div><div class="si-mt">${s.country||'—'} · ${s.inc} · ${s.qty||0}MT · ${new Date(s.ts).toLocaleDateString('ko-KR')}</div></div><div class="si-pr">${Math.round(s.total||0).toLocaleString()}원</div></div>`).join('');
+}
+
+async function share(){
+  if(!G.res)return;
+  const t=`📦 ImportCost 수입원가\n국가: ${G.country} | 조건: ${G.inc}\n최종원가: ${fmt(G.res.total)}원\n톤당: ${G.res.qty>0?fmt(G.res.total/G.res.qty):'—'}원/MT`;
+  if(navigator.share)await navigator.share({title:'ImportCost',text:t});
+  else{navigator.clipboard?.writeText(t);toast('클립보드에 복사');}
+}
+
+function resetAll(){G.s=1;G.country='';G.inc='FOB';G.res=null;G.re=0;hideSaved();}
+
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+let dp=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('ibar').classList.add('show');});
+document.getElementById('ibtn').addEventListener('click',async()=>{if(!dp)return;dp.prompt();const r=await dp.userChoice;if(r.outcome==='accepted')toast('홈 화면에 추가되었습니다!');dp=null;document.getElementById('ibar').classList.remove('show');});
+window.addEventListener('online',()=>{document.getElementById('offbar').classList.remove('show');loadRates();});
+window.addEventListener('offline',()=>{document.getElementById('offbar').classList.add('show');});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+updNav();
+loadRates();
+</script>
+</body>
+</html>
