@@ -109,6 +109,50 @@ input[readonly]{color:var(--accent);font-family:var(--mono)}
 #toast{position:fixed;bottom:calc(90px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg4);border:1px solid var(--border2);border-radius:24px;padding:10px 22px;font-size:13px;color:var(--text);opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .view{display:none}.view.on{display:block}
+/* Chat */
+.chat-fab{position:fixed;bottom:calc(80px + var(--safe-b));right:max(16px,calc((100vw - 430px)/2 + 16px));width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#000;font-size:24px;cursor:pointer;z-index:998;box-shadow:0 4px 20px rgba(0,229,160,.35);display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s}
+.chat-fab:active{transform:scale(.92)}
+.chat-fab .badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-family:var(--mono)}
+.chat-overlay{position:fixed;inset:0;background:var(--bg);z-index:1000;display:none;flex-direction:column;max-width:430px;margin:0 auto}
+.chat-overlay.open{display:flex}
+.chat-hd{background:var(--bg2);border-bottom:1px solid var(--border);padding:var(--safe-t) 16px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-hd-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+.chat-hd-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+.chat-hd-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chat-msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat-welcome{text-align:center;padding:20px 0 10px}
+.chat-welcome h3{font-size:15px;font-weight:500;margin-bottom:6px}
+.chat-welcome p{font-size:12px;color:var(--text2);line-height:1.5}
+.chat-ctx{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-size:11px;color:var(--text2);font-family:var(--mono);line-height:1.6;margin:0 0 4px}
+.chat-ctx strong{color:var(--accent);font-weight:500}
+.quick-qs{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.quick-q{padding:10px 14px;background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.15);border-radius:var(--r);font-size:12px;color:var(--accent);cursor:pointer;text-align:left;transition:background .15s}
+.quick-q:active{background:rgba(0,229,160,.12)}
+.chat-bubble-ai{background:var(--bg3);border:1px solid var(--border2);border-radius:4px 18px 18px 18px;padding:12px 14px;font-size:13px;line-height:1.7;color:var(--text);max-width:100%}
+.chat-ai-label{font-size:10px;color:var(--accent);font-family:var(--mono);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.chat-bubble-user{background:linear-gradient(135deg,#00e5a0,#00c9ff);color:#0A0E1A;border-radius:18px 4px 18px 18px;padding:12px 14px;font-size:13px;line-height:1.7;max-width:80%;margin-left:auto;font-weight:500}
+.chat-typing{background:var(--bg3);border:1px solid var(--border2);border-radius:4px 18px 18px 18px;padding:12px 16px;display:flex;gap:5px;align-items:center;width:fit-content}
+.chat-typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:typingPulse 1.2s ease infinite}
+.chat-typing-dot:nth-child(2){animation-delay:.2s}
+.chat-typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+.chat-input-wrap{background:var(--bg2);border-top:1px solid var(--border);padding:12px 16px;padding-bottom:calc(12px + var(--safe-b));display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
+.chat-input-wrap textarea{flex:1;padding:12px 14px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:20px;color:var(--text);font-size:13px;font-family:var(--sans);resize:none;max-height:100px;line-height:1.4}
+.chat-input-wrap textarea:focus{border-color:var(--accent);background:var(--bg4);outline:none}
+.chat-send{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#000;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+.chat-send:disabled{opacity:.3;cursor:default}
+.chat-count{font-size:10px;color:var(--text3);font-family:var(--mono);text-align:center;padding:4px 0 0}
+/* API Key Modal */
+.apikey-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:none;align-items:center;justify-content:center;padding:20px}
+.apikey-overlay.open{display:flex}
+.apikey-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:24px;width:100%;max-width:360px}
+.apikey-modal h3{font-size:16px;margin-bottom:4px}
+.apikey-modal p{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:16px}
+.apikey-modal input{width:100%;padding:13px 16px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:13px;font-family:var(--mono);margin-bottom:12px}
+.apikey-modal input:focus{border-color:var(--accent);outline:none}
+.apikey-modal .btn-row{display:flex;gap:8px}
+.apikey-modal .btn-primary{flex:1;padding:12px;background:var(--accent);border:none;border-radius:var(--r);color:#000;font-size:14px;font-weight:700;cursor:pointer}
+.apikey-modal .btn-secondary{padding:12px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-size:14px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -320,6 +364,53 @@ input[readonly]{color:var(--accent);font-family:var(--mono)}
   </div>
 </div>
 <div id="toast"></div>
+
+<!-- Chat FAB -->
+<button class="chat-fab" id="chatFab" onclick="toggleChat()">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<!-- Chat Overlay -->
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-hd">
+    <div class="chat-hd-title"><div class="dot"></div>AI 무역 상담</div>
+    <div style="display:flex;gap:8px;">
+      <button class="chat-hd-btn" onclick="openApiKeyModal()" title="API 키 설정">⚙</button>
+      <button class="chat-hd-btn" onclick="toggleChat()">✕</button>
+    </div>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="chat-welcome">
+      <h3>무역 AI 상담사</h3>
+      <p>수입 실무, 통관, FTA, Incoterms, 필요 서류 등<br>무역 관련 질문에 답변해드립니다.</p>
+    </div>
+    <div class="chat-ctx" id="chatCtx"></div>
+    <div class="quick-qs" id="quickQs">
+      <div class="quick-q" onclick="quickQ('이 조건으로 수입할 때 필요한 서류는?')">📋 이 조건으로 수입할 때 필요한 서류는?</div>
+      <div class="quick-q" onclick="quickQ('FTA 원산지증명서 발급 방법은?')">📄 FTA 원산지증명서 발급 방법은?</div>
+      <div class="quick-q" onclick="quickQ('CIF와 FOB 비용 차이를 설명해주세요')">🚢 CIF와 FOB 비용 차이를 설명해주세요</div>
+    </div>
+  </div>
+  <div class="chat-count" id="chatCount"></div>
+  <div class="chat-input-wrap">
+    <textarea id="chatInput" rows="1" placeholder="무역 관련 질문을 입력하세요..." oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+    <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="apikey-overlay" id="apikeyOverlay" onclick="if(event.target===this)closeApiKeyModal()">
+  <div class="apikey-modal">
+    <h3>🔑 AI API 키 설정</h3>
+    <p>Anthropic API 키를 입력하면 무제한 상담이 가능합니다.<br>키는 브라우저에만 저장되며 외부로 전송되지 않습니다.</p>
+    <input type="text" id="apikeyInput" placeholder="sk-ant-api03-...">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:16px;">발급: <span style="color:var(--accent)">console.anthropic.com</span></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="clearApiKey()">삭제</button>
+      <button class="btn-primary" onclick="saveApiKey()">저장</button>
+    </div>
+  </div>
+</div>
 <script>
 const G={s:1,country:'',inc:'FOB',re:0,R:{CNY:190.2,USD:1374,EUR:1498,JPY:9.18,AUD:880},res:null};
 const PORTS={CN:['상하이항','칭다오항','텐진항','광저우항','닝보항','선전항','다롄항'],VN:['호치민항','하이퐁항','다낭항'],US:['LA항','롱비치항','뉴욕항','시애틀항'],DE:['함부르크항','브레멘항'],JP:['도쿄항','요코하마항','오사카항','나고야항'],AU:['시드니항','멜버른항','브리즈번항'],IN:['뭄바이항','첸나이항','자와할랄네루항'],TH:['람차방항','방콕항'],MY:['포트클랑항','페낭항'],SG:['싱가포르항'],BR:['산토스항','리우항'],RU:['블라디보스토크항','나호트카항'],SA:['담맘항','지다항']};
@@ -546,6 +637,199 @@ window.addEventListener('offline',()=>{document.getElementById('offbar').classLi
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 updNav();
 loadRates();
+
+// ===== AI Chat =====
+const CHAT_API='https://anibridge-api.koreagwangju.workers.dev';
+const MAX_CHAT=5;
+let chatHistory=[];
+let chatLoading=false;
+
+function getChatTodayKey(){return 'ic_chat_'+new Date().toISOString().slice(0,10);}
+function getChatUsed(){return parseInt(localStorage.getItem(getChatTodayKey())||'0');}
+function addChatUsed(){localStorage.setItem(getChatTodayKey(),getChatUsed()+1);}
+function getChatRemain(){return Math.max(0,MAX_CHAT-getChatUsed());}
+function getApiKey(){return localStorage.getItem('importcost_apikey')||'';}
+
+function updateChatCount(){
+  const el=document.getElementById('chatCount');
+  if(!el)return;
+  const key=getApiKey();
+  if(key){el.textContent='API 키 사용 · 무제한';el.style.color='var(--accent)';return;}
+  const r=getChatRemain();
+  el.textContent=r>0?'오늘 '+r+'회 남음 (무료)':'오늘 소진 — API 키 등록 시 무제한';
+  el.style.color=r>0?'var(--text3)':'var(--warn)';
+}
+
+function getContext(){
+  const country=document.getElementById('sc')?.value||'';
+  const cNames={CN:'중국',VN:'베트남',US:'미국',DE:'독일',JP:'일본',AU:'호주',IN:'인도',TH:'태국',MY:'말레이시아',SG:'싱가포르',BR:'브라질',RU:'러시아',SA:'사우디'};
+  const cur=document.getElementById('scur')?.value||'USD';
+  const price=document.getElementById('iprice')?.value||'';
+  const qty=document.getElementById('iqty')?.value||'';
+  const hs=document.getElementById('ihs')?.value||'';
+  const pnm=document.getElementById('ipnm')?.value||'';
+  const tariff=document.getElementById('itariff')?.value||'';
+  const rate=document.getElementById('irate')?.value||'';
+  const f=FTA[country];
+  const total=G.res?.total||0;
+  return {country:cNames[country]||country,inc:G.inc,cur,price,qty,hs,pnm,tariff,rate,fta:f?f.nm:'',ftaYn:f?.y?'적용':'미적용',total};
+}
+
+function getChatSystem(){
+  const c=getContext();
+  let ctx='(아직 계산 조건이 입력되지 않았습니다)';
+  if(c.country){
+    ctx=`- 수출국: ${c.country}\n- Incoterms: ${c.inc}\n- 통화: ${c.cur}, 환율: ${c.rate} KRW`;
+    if(c.pnm)ctx+=`\n- 품목: ${c.pnm}${c.hs?' (HS '+c.hs+')':''}`;
+    if(c.qty)ctx+=`\n- 수량: ${c.qty}MT, 단가: ${c.price} ${c.cur}/MT`;
+    if(c.tariff)ctx+=`\n- 관세율: ${c.tariff}%`;
+    if(c.fta)ctx+=`\n- FTA: ${c.fta} (${c.ftaYn})`;
+    if(c.total>0)ctx+=`\n- 예상 총 수입원가: ${fmt(c.total)}원`;
+  }
+  return `당신은 ImportCost의 수입 무역 전문 AI 상담사입니다.
+한국의 중소 무역업체 실무자에게 수입 실무를 도와줍니다.
+
+규칙:
+1. 한국어로 답변합니다
+2. 수입 실무(통관, 서류, FTA, Incoterms, HS코드, 관세 등)에 대해 정확하게 답변합니다
+3. 법적 구속력이 있는 조언이 아닌 실무 참고 정보임을 필요 시 안내합니다
+4. 3~5문장으로 간결하고 실용적으로 답변합니다
+5. 현재 사용자의 계산 컨텍스트를 참고하여 맥락에 맞는 답변을 합니다
+6. 이모지를 적절히 사용해 가독성을 높입니다
+
+현재 계산 컨텍스트:
+${ctx}`;
+}
+
+function updateChatCtx(){
+  const el=document.getElementById('chatCtx');
+  if(!el)return;
+  const c=getContext();
+  if(!c.country){el.style.display='none';return;}
+  el.style.display='block';
+  let html='<strong>현재 조건</strong> ';
+  html+=c.country+' · '+c.inc;
+  if(c.pnm)html+=' · '+c.pnm;
+  if(c.qty)html+=` · ${c.qty}MT`;
+  if(c.total>0)html+=` · <strong>${fmt(c.total)}원</strong>`;
+  el.innerHTML=html;
+}
+
+function toggleChat(){
+  const ov=document.getElementById('chatOverlay');
+  const open=ov.classList.toggle('open');
+  if(open){updateChatCtx();updateChatCount();}
+}
+
+function quickQ(text){
+  document.getElementById('chatInput').value=text;
+  sendChat();
+}
+
+function appendUserMsg(text){
+  const el=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='chat-bubble-user';
+  d.textContent=text;
+  el.appendChild(d);
+  el.scrollTop=el.scrollHeight;
+}
+
+function appendAiMsg(text){
+  const el=document.getElementById('chatMsgs');
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<div class="chat-ai-label">🔍 ImportCost AI</div><div class="chat-bubble-ai">${text.replace(/\n/g,'<br>')}</div>`;
+  el.appendChild(wrap);
+  el.scrollTop=el.scrollHeight;
+}
+
+function appendTyping(){
+  const el=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='chat-typing';d.id='chatTyping';
+  d.innerHTML='<div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>';
+  el.appendChild(d);
+  el.scrollTop=el.scrollHeight;
+  return d;
+}
+
+function removeTyping(){const el=document.getElementById('chatTyping');if(el)el.remove();}
+
+async function sendChat(){
+  if(chatLoading)return;
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text)return;
+
+  const key=getApiKey();
+  if(!key&&getChatRemain()<=0){
+    toast('오늘 무료 상담 횟수를 모두 사용했습니다');
+    openApiKeyModal();
+    return;
+  }
+
+  // Hide quick questions
+  const qq=document.getElementById('quickQs');
+  if(qq)qq.style.display='none';
+
+  input.value='';
+  input.style.height='auto';
+  appendUserMsg(text);
+
+  chatHistory.push({role:'user',content:text});
+  if(chatHistory.length>10)chatHistory=chatHistory.slice(-10);
+
+  chatLoading=true;
+  document.getElementById('chatSendBtn').disabled=true;
+  appendTyping();
+
+  try{
+    const body={model:'claude-sonnet-4-20250514',max_tokens:800,system:getChatSystem(),messages:chatHistory};
+    const headers={'Content-Type':'application/json'};
+    if(key)headers['x-api-key']=key;
+
+    const res=await fetch(CHAT_API,{method:'POST',headers,body:JSON.stringify(body)});
+    if(!res.ok)throw new Error('API 오류: '+res.status);
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'답변을 가져오지 못했습니다.';
+
+    removeTyping();
+    appendAiMsg(reply);
+    chatHistory.push({role:'assistant',content:reply});
+    if(!key)addChatUsed();
+    updateChatCount();
+  }catch(err){
+    removeTyping();
+    appendAiMsg('⚠️ 오류가 발생했습니다: '+err.message+'\n\nAPI 키를 확인하거나 잠시 후 다시 시도해주세요.');
+  }finally{
+    chatLoading=false;
+    document.getElementById('chatSendBtn').disabled=false;
+  }
+}
+
+// API Key
+function openApiKeyModal(){
+  const key=getApiKey();
+  document.getElementById('apikeyInput').value=key?key.substring(0,20)+'...':'';
+  document.getElementById('apikeyOverlay').classList.add('open');
+}
+function closeApiKeyModal(){document.getElementById('apikeyOverlay').classList.remove('open');}
+function saveApiKey(){
+  const key=document.getElementById('apikeyInput').value.trim();
+  if(!key){toast('API 키를 입력해주세요');return;}
+  if(!key.startsWith('sk-ant')){toast('올바른 API 키 형식이 아닙니다 (sk-ant-로 시작)');return;}
+  localStorage.setItem('importcost_apikey',key);
+  closeApiKeyModal();
+  updateChatCount();
+  toast('✅ API 키가 저장되었습니다');
+}
+function clearApiKey(){
+  localStorage.removeItem('importcost_apikey');
+  document.getElementById('apikeyInput').value='';
+  closeApiKeyModal();
+  updateChatCount();
+  toast('API 키가 삭제되었습니다');
+}
 </script>
 </body>
 </html>
