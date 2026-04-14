@@ -2,11 +2,11 @@ const CACHE_NAME = 'importcost-v1.0.0';
 const RATE_CACHE = 'importcost-rates-v1';
 
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/importcost/',
+  '/importcost/index.html',
+  '/importcost/manifest.json',
+  '/importcost/icons/icon-192.png',
+  '/importcost/icons/icon-512.png'
 ];
 
 // 설치
